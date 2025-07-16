@@ -11,24 +11,26 @@ function Secondheader() {
   const profileRef = useRef(null);
      const setUser = useSetRecoilState(userAtom);
 
-  const logoutuser = async () => {
-    try {
-     
-      localStorage.removeItem("medium2token");
-   
-  setUser({
-  userName: "",
-  userEmail: "",
-  userId: ""
-});
-localStorage.removeItem("user"); 
-localStorage.removeItem("token");
-setUser({ userName: "", userEmail: "", userId: "" });
-      navigate('/signin');
-    } catch (err) {
-      console.log("unable to logout", err.message);
-    }
-  };
+  const logoutuser = () => {
+  try {
+    // Clear token and user data
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("medium2token");
+
+    // Reset Recoil state
+    setUser({
+      userName: "",
+      userEmail: "",
+      userId: ""
+    });
+
+    navigate('/signin');
+  } catch (err) {
+    console.log("unable to logout", err.message);
+  }
+};
+
 
 
   const handleSearch = (e) => {
@@ -51,7 +53,7 @@ setUser({ userName: "", userEmail: "", userId: "" });
 
   return (
     <div className="w-full border-b border-gray-300">
-      <div className="flex justify-between items-center md:px-25 px-5">
+      <div className="flex justify-between items-center md:px-25 py-5 pl-10">
         <div className='flex justify-between'>
           <Link to='/medium2'>
             <div>

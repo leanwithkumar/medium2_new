@@ -104,7 +104,7 @@ function Signup() {
       <div className="h-screen md:mx-20 mx-10">
         <div className="md:mx-60 md:py-20">
           <div>
-            <div className="text-xl md:text-5xl font-mono text-gray-800 break-words text-left py-10">
+            <div className="text-5xl font-mono text-gray-800 break-words text-left py-10">
               create new account
             </div>
 

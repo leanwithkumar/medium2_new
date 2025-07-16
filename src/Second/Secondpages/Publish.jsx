@@ -50,7 +50,7 @@ function Publish() {
       }, 2000);
 
     } catch (err) {
-      console.error("❌ Publish error:", err);
+      console.error("Publish error:", err);
       toast.error(err?.response?.data?.errors?.[0] || err?.response?.data?.message || "Failed to publish blog");
     }
   };
@@ -141,7 +141,7 @@ function Publish() {
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleTagInput}
-            placeholder="Add tags (max 5) and press Enter"
+            placeholder="max 5 tags"
             className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-3xl placeholder:font-serif resize-none overflow-hidden"
           />
         </div>

@@ -32,7 +32,7 @@ function Profile() {
 
         setBlogs(result.data.blogs || []);
       } catch (err) {
-        console.error('❌ Failed to fetch blogs', err);
+        console.error('Failed to fetch blogs', err);
         toast.error('Could not fetch blogs. Try again.');
       } finally {
         setLoading(false);
@@ -100,7 +100,13 @@ function Profile() {
 
   return (
     <>
-      <div className="py-5 text-gray-600 font-mono">
+    <div className='px-5'>
+
+
+
+
+    
+      <div className="py-5 text-gray-600 font-mono ">
         <div className="text-5xl flex justify-between items-center">
           <div>{user.userName || "Profile"}</div>
           <button
@@ -127,34 +133,38 @@ function Profile() {
           blogs.map((blog) => (
             <div
               key={blog._id}
-              className="border-b text-gray-700 font-mono py-5 hover:bg-gray-50"
+              className="border-b text-gray-700 font-mono py-5 hover:bg-gray-50 "
             >
               <div className="flex justify-between items-start gap-4">
                 <Link
                   to={`/medium2/readblog/${blog._id}`}
                   className="w-full hover:underline"
                 >
-                  <div className="text-2xl font-semibold break-words">
+                  <div className="text-2xl font-semibold break-words break-all whitespace-normal overflow-hidden">
                     {blog.title}
                   </div>
                   <div className="text-sm text-gray-500">
                     {new Date(blog.createdAt).toLocaleDateString()}
                   </div>
                 </Link>
-                <div className="flex flex-col items-end gap-2">
-                  <Link
-                    to={`/medium2/editblog/${blog._id}`}
-                    className="text-green-500 text-sm hover:underline"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => confirmAndDelete(blog._id)}
-                    className="text-red-500 text-sm hover:underline"
-                  >
-                    Delete
-                  </button>
-                </div>
+                <div className="flex md:flex-col flex-row md:items-end items-center gap-2 flex-wrap mt-2">
+  <Link
+    to={`/medium2/editblog/${blog._id}`}
+    className="text-green-500 text-sm hover:underline"
+  >
+    Edit
+  </Link>
+  <button
+    onClick={() => confirmAndDelete(blog._id)}
+    className="text-red-500 text-sm hover:underline"
+  >
+    Delete
+  </button>
+</div>
+
+
+
+
               </div>
             </div>
           ))
@@ -172,6 +182,7 @@ function Profile() {
         theme="light"
         transition={Bounce}
       />
+      </div>
     </>
   );
 }
