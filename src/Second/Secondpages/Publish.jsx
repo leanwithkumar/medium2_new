@@ -141,7 +141,7 @@ function Publish() {
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleTagInput}
-            placeholder="max 5 tags"
+            placeholder="press enter (max five tags)"
             className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-3xl placeholder:font-serif resize-none overflow-hidden"
           />
         </div>
