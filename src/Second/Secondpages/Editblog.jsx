@@ -1,10 +1,8 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import TextareaAutosize from 'react-textarea-autosize';
 import { toast, ToastContainer, Bounce } from 'react-toastify';
-
-
 
 function EditBlog() {
   const { blogid } = useParams();
@@ -25,6 +23,7 @@ function EditBlog() {
         setTags(blog.tags || []);
       } catch (err) {
         console.error("Failed to load blog", err);
+        toast.error("Failed to load blog");
       }
     };
     fetchBlog();
@@ -33,31 +32,58 @@ function EditBlog() {
   const editThis = async () => {
     try {
       if (!title || !content) {
-        return toast('All fields are required');
+        return toast.warn('All fields are required', {
+          position: 'bottom-right',
+          autoClose: 3000,
+          theme: 'light',
+          transition: Bounce,
+        });
       }
-      toast.info("Updating your Blog")
-    await axios.put(
-  `https://newmedium2-backend.onrender.com/${blogid}`,
-  { title, content, tags },
-  { withCredentials: true }
-);
 
+      toast.info("Updating your Blog", {
+        position: 'bottom-right',
+        autoClose: 2000,
+        theme: 'light',
+        transition: Bounce,
+      });
 
-      toast.success('Blog updated successfully');
-      toast.success('Redirecting to Profile');
-      setTimeout(()=>{
-      navigate('/medium2/profile');
-      }, 3000)
+      const token = JSON.parse(localStorage.getItem("token"));
+
+      await axios.put(
+        `https://newmedium2-backend.onrender.com/${blogid}`,
+        { title, content, tags },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success('Blog updated successfully', {
+        position: 'bottom-right',
+        autoClose: 2000,
+        theme: 'light',
+        transition: Bounce,
+      });
+
+      toast.success('Redirecting to Profile', {
+        position: 'bottom-right',
+        autoClose: 2000,
+        theme: 'light',
+        transition: Bounce,
+      });
+
+      setTimeout(() => {
+        navigate('/medium2/profile');
+      }, 3000);
     } catch (err) {
       console.log(err);
-      toast(err?.response?.data?.errors?.[0] || err.message);
+      toast.error(err?.response?.data?.errors?.[0] || err.message);
     }
   };
 
   return (
     <>
-      
-
       <div className="mx-5 my-20 font-mono">
         <div className="pb-10">
           <TextareaAutosize
@@ -116,30 +142,29 @@ function EditBlog() {
             className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-3xl placeholder:font-serif resize-none overflow-hidden"
           />
         </div>
-        <div className="md:flex gap-4 p-2 text-base sm:text-lg md:text-xl">
-            <button
-              onClick={editThis}
-              className="text-white px-8 py-2 rounded-full bg-green-400 font-medium shadow-sm"
-            >
-              Edit
-            </button>
-    </div>
 
-         
-    </div>
-     <ToastContainer
-                  position="bottom-right"
-                  autoClose={2000}
-                  hideProgressBar={true}
-                  newestOnTop={false}
-                  rtl={false}
-                  pauseOnFocusLoss={false}
-                  draggable
-                  pauseOnHover
-                  theme="light"
-                  transition = {Bounce}
-                />
-    
+        <div className="md:flex gap-4 p-2 text-base sm:text-lg md:text-xl">
+          <button
+            onClick={editThis}
+            className="text-white px-8 py-2 rounded-full bg-green-400 font-medium shadow-sm"
+          >
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
     </>
   );
 }

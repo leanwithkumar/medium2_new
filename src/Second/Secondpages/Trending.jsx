@@ -10,9 +10,14 @@ function Trending() {
 
   const fetchBlogs = async (pageNumber) => {
     try {
+      const token = JSON.parse(localStorage.getItem("token"));
+
       const res = await axios.get(`https://newmedium2-backend.onrender.com/trending?page=${pageNumber}`, {
-      withCredentials: true
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
+
       const newBlogs = res.data;
 
       if (newBlogs.length === 0) {

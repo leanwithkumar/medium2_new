@@ -1,40 +1,38 @@
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 function Readblog() {
-  
   const { blogid } = useParams();
   const [blog, setBlog] = useState(null);
 
-useEffect(() => {
-  console.log("Blog ID from URL params:", blogid); // ✅ this will show the ID when component mounts
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const token = JSON.parse(localStorage.getItem('token'));
 
-  const fetchBlog = async () => {
-    try {
-  const res = await axios.get(`https://newmedium2-backend.onrender.com/${blogid}`, {
-  withCredentials: true
-  });      
-  console.log("Fetched blog data:", res.data); // ✅ check what you actually get
-      setBlog(res.data);
-    } catch (err) {
-      console.error("Failed to fetch blog", err);
-    }
-  };
+        const res = await axios.get(`https://newmedium2-backend.onrender.com/${blogid}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  fetchBlog();
-}, [blogid]);
+        console.log("Fetched blog data:", res.data);
+        setBlog(res.data);
+      } catch (err) {
+        console.error("Failed to fetch blog", err);
+      }
+    };
 
+    fetchBlog();
+  }, [blogid]);
 
   if (!blog) {
     return <div className="text-center py-10">Loading blog...</div>;
   }
-  console.log("Blog ID:", blogid);
 
   return (
     <div className="text-gray-700 p-5 font-mono">
-      
-
       <div className="text-4xl break-words">{blog.title}</div>
       <div className="px-2 text-xl py-2">- {blog.author?.username || 'Unknown'}</div>
       <div className="text-sm text-gray-500">

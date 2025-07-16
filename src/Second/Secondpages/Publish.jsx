@@ -6,38 +6,45 @@ import { Bounce, ToastContainer, toast } from 'react-toastify';
 import { useRecoilValue } from 'recoil';
 import userAtom from '../../Store/userAtom';
 
-
 function Publish() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState('');
-  const navigate = useNavigate()
-  const user = useRecoilValue(userAtom)
-  const userID = user.userId
-
+  const navigate = useNavigate();
+  const user = useRecoilValue(userAtom);
+  const userID = user.userId;
 
   const publishthis = async () => {
     try {
       if (!title || !content) {
         return toast.warn('All fields are required');
       }
-      toast.info("publising you blog")
-      const posted = await axios.post('https://newmedium2-backend.onrender.com/publish', {
-        title,
-        content,
-        tags,
-        userID
-        
-      });
 
-     toast.success("blog added sucessfully")
-     toast.success("redirecting to home page")
-     console.log(posted);
-      setTimeout(()=>{
-        navigate('/medium2')
-      }, 3000)
-    
+      const token = JSON.parse(localStorage.getItem("token"));
+      if (!token) {
+        return toast.error("You are not logged in. Please sign in.");
+      }
+
+      toast.info("Publishing your blog...");
+
+      const posted = await axios.post(
+        'https://newmedium2-backend.onrender.com/publish',
+        { title, content, tags, userID },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success("Blog added successfully");
+      toast.success("Redirecting to home page");
+      console.log(posted);
+
+      setTimeout(() => {
+        navigate('/medium2');
+      }, 3000);
 
     } catch (err) {
       console.log(err);
@@ -47,20 +54,17 @@ function Publish() {
 
   return (
     <>
-      
-      <div className="w-full border-b border-gray-300 ">
+      <div className="w-full border-b border-gray-300">
         <div className="flex justify-evenly items-center md:px-25 px-5">
           <div className="flex justify-between">
             <Link to="/medium2">
-              <div>
-                <img
-                  src="/Medium2.png"
-                  width="170"
-                  height="40"
-                  className="max-w-full h-auto py-5"
-                  alt="Logo"
-                />
-              </div>
+              <img
+                src="/Medium2.png"
+                width="170"
+                height="40"
+                className="max-w-full h-auto py-5"
+                alt="Logo"
+              />
             </Link>
           </div>
 
@@ -75,35 +79,27 @@ function Publish() {
         </div>
       </div>
 
-      
       <div className="mx-5 md:ml-30 md:mr-80 my-20">
-        
         <div className="pb-10">
           <TextareaAutosize
             minRows={1}
-            className="text-5xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full 
-                     placeholder:text-5xl placeholder:font-serif 
-                     resize-none overflow-hidden font-mono"
+            className="text-5xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-5xl placeholder:font-serif resize-none overflow-hidden font-mono"
             placeholder="Share your thought"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
-        
         <div className="pb-10 font-mono">
           <TextareaAutosize
             minRows={5}
-            className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full 
-                     placeholder:text-3xl placeholder:font-serif 
-                     resize-none overflow-hidden"
+            className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-3xl placeholder:font-serif resize-none overflow-hidden"
             placeholder="Make us understand"
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />
         </div>
 
-        
         <div className="mb-4 flex items-center gap-2 flex-wrap">
           {tags.map((tag, index) => (
             <span
@@ -113,9 +109,7 @@ function Publish() {
               # {tag}
               <button
                 className="ml-2 text-black"
-                onClick={() =>
-                  setTags(tags.filter((_, i) => i !== index))
-                }
+                onClick={() => setTags(tags.filter((_, i) => i !== index))}
               >
                 &times;
               </button>
@@ -140,24 +134,23 @@ function Publish() {
               }
             }}
             placeholder="tags"
-            className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full 
-                     placeholder:text-3xl placeholder:font-serif 
-                     resize-none overflow-hidden  "
+            className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-3xl placeholder:font-serif resize-none overflow-hidden"
           />
         </div>
       </div>
+
       <ToastContainer
-                  position="bottom-right"
-                  autoClose={4000}
-                  hideProgressBar={true}
-                  newestOnTop={false}
-                  rtl={false}
-                  pauseOnFocusLoss={false}
-                  draggable
-                  pauseOnHover
-                  theme="light"
-                  transition = {Bounce}
-                />
+        position="bottom-right"
+        autoClose={4000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
     </>
   );
 }

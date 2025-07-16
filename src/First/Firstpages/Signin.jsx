@@ -1,98 +1,59 @@
+// components/Signin.jsx
+
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
-
+import 'react-toastify/dist/ReactToastify.css';
 
 function Signin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-
-  const signinuser= async(e)=>{
+  const signinuser = async (e) => {
     e.preventDefault();
-    console.log("Signin function triggered")
-    if(!email || !password){
-     return toast.warn('All fields are required', {
-            position: 'bottom-right',
-            autoClose: 3000,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-            transition: Bounce,
-          });
+    if (!email || !password) {
+      return toast.warn('All fields are required', { position: 'bottom-right', autoClose: 3000, transition: Bounce });
     }
-    toast.info('Checking details', {
-          position: 'bottom-right',
-          autoClose: 4000,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-          transition: Bounce,
-        });
+
+    toast.info('Checking details', { position: 'bottom-right', autoClose: 4000, transition: Bounce });
 
     try {
-  console.log("Sending signin request...");
+      const response = await axios.post("https://newmedium2-backend.onrender.com/signin", {
+        email,
+        password,
+      });
 
+      toast.success(response.data.message, { position: 'bottom-right', transition: Bounce });
 
-  const response = await axios.post("https://newmedium2-backend.onrender.com/signin", {
-  email,
-  password
-}, {
-  withCredentials: true  
-});
+      const userData = {
+        userName: response.data.username,
+        userEmail: response.data.email,
+        userId: response.data.userId,
+      };
+      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("token", response.data.token);  // ✅ Save token to localStorage
 
-  console.log("Response received:", response);
+      setEmail("");
+      setPassword("");
 
-  toast.success(response.data.message, );
-  const userData = {
-  userName: response.data.username,
-  userEmail: response.data.email,
-  userId: response.data.userId,
-};
-localStorage.setItem("user", JSON.stringify(userData));
+      setTimeout(() => {
+        navigate('/medium2');
+      }, 2000);
 
-  setEmail("");
-  setPassword("");
-  console.log("Redirecting to /medium2");
-
- 
-
-  setTimeout(() => {
-    navigate('/medium2');
-  }, 2000);
-
-} catch (err) {
-  console.log("Error caught in catch block:");
-  console.log(err); 
-  console.log("Error.response:", err.response);
-
-  const errorMessage =
-    err.response?.data?.message ||
-    err.response?.data?.errors?.[0] ||
-    'Signin failed';
-
-  toast.error(errorMessage);
-  toast.error("try with chrome browser");
-}
-
-    
-  }
-  
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.response?.data?.errors?.[0] || 'Signin failed';
+      toast.error(errorMessage, { position: 'bottom-right', transition: Bounce });
+    }
+  };
 
   return (
     <>
       <div className="h-screen md:mx-20 mx-10">
         <div className="md:mx-60 md:py-20">
           <div>
-            <div className="text-xl md:text-5xl font-mono text-gray-800 break-words text-left md:text-left py-10">
-              sign in
-            </div>
+            <div className="text-xl md:text-5xl font-mono text-gray-800 py-10">sign in</div>
 
             <div>
               <div className="py-5">
@@ -120,32 +81,33 @@ localStorage.setItem("user", JSON.stringify(userData));
               </div>
 
               <div>
-                <button className="text-xl md:text-2xl font-mono text-gray-800 break-words text-left md:text-left hover:underline"
-                onClick={signinuser}>
+                <button
+                  className="text-xl md:text-2xl font-mono text-gray-800 hover:underline"
+                  onClick={signinuser}>
                   sign in
                 </button>
               </div>
 
               <div>
-                <div className="text-xl md:text-2xl font-mono text-gray-800 break-words text-left md:text-left hover:underline">
-                  <Link to='/getstarted'>Are you new to medium2</Link>
-                </div>
+                <Link to="/getstarted" className="text-xl md:text-2xl font-mono text-gray-800 hover:underline">
+                  Are you new to medium2
+                </Link>
               </div>
             </div>
           </div>
         </div>
+
         <ToastContainer
-                  position="bottom-right"
-                  autoClose={3000}
-                  hideProgressBar={true}
-                  newestOnTop={false}
-                  rtl={false}
-                  pauseOnFocusLoss={false}
-                  draggable
-                  pauseOnHover
-                  theme="light"
-                  transition = {Bounce}
-                />
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={true}
+          newestOnTop={false}
+          pauseOnFocusLoss={false}
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce}
+        />
       </div>
     </>
   );

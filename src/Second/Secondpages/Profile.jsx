@@ -14,15 +14,19 @@ function Profile() {
   useEffect(() => {
     const fetchUserBlogs = async () => {
       try {
+        const token = JSON.parse(localStorage.getItem("token"));
         const result = await axios.get(
           `https://newmedium2-backend.onrender.com/${user.userId}`,
           {
-            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         setBlogs(result.data.blogs);
       } catch (err) {
         console.error('Failed to fetch blogs', err);
+        toast.error('Could not fetch blogs. Try again.');
       } finally {
         setLoading(false);
       }
@@ -71,8 +75,11 @@ function Profile() {
 
   const deleteBlog = async (blogid) => {
     try {
+      const token = JSON.parse(localStorage.getItem("token"));
       await axios.delete(`https://newmedium2-backend.onrender.com/${blogid}`, {
-        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       setBlogs(blogs.filter((blog) => blog._id !== blogid));
       toast.success('Blog deleted successfully');
@@ -114,7 +121,6 @@ function Profile() {
               className="border-b text-gray-700 font-mono py-5 hover:bg-gray-50"
             >
               <div className="flex justify-between items-start gap-4">
-                {/* ✅ Navigates to blog read page (fetch is done in Readblog.jsx) */}
                 <Link
                   to={`/medium2/readblog/${blog._id}`}
                   className="w-full hover:underline"

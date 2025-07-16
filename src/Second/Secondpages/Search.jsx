@@ -12,9 +12,12 @@ function Search() {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-const res = await axios.get(`https://newmedium2-backend.onrender.com/search?query=${query}`, {
-  withCredentials: true
-});
+        const token = JSON.parse(localStorage.getItem("token"));
+        const res = await axios.get(`https://newmedium2-backend.onrender.com/search?query=${query}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setResults(res.data);
       } catch (err) {
         console.error("Search failed", err);
@@ -33,7 +36,7 @@ const res = await axios.get(`https://newmedium2-backend.onrender.com/search?quer
   return (
     <div className="p-6 max-w-3xl mx-auto font-mono">
       <h2 className="text-4xl mb-4">
-        showing results for <span className="text-red-500">{query}</span>:
+        Showing results for <span className="text-red-500">{query}</span>:
       </h2>
 
       {results.length === 0 ? (
@@ -44,7 +47,7 @@ const res = await axios.get(`https://newmedium2-backend.onrender.com/search?quer
             <div className="mb-6 py-4 border-b">
               <h3 className="text-3xl py-2">{blog.title}</h3>
               <p className="text-sm text-gray-600">
-                by {blog.author?.username || "Unknown"} <span> on </span>{" "}
+                by {blog.author?.username || "Unknown"} on{" "}
                 {new Date(blog.createdAt).toLocaleDateString()}
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
