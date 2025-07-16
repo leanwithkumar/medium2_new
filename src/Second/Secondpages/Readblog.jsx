@@ -12,7 +12,7 @@ useEffect(() => {
 
   const fetchBlog = async () => {
     try {
-  const res = await axios.get(`http://localhost:5000/readblog/${blogid}`, {
+  const res = await axios.get(`https://newmedium2-backend.onrender.com/${blogid}`, {
   withCredentials: true
   });      
   console.log("Fetched blog data:", res.data); // ✅ check what you actually get

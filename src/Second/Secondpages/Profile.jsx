@@ -15,7 +15,7 @@ function Profile() {
     const fetchUserBlogs = async () => {
       try {
         const result = await axios.get(
-          `http://localhost:5000/usersblog/${user.userId}`,
+          `https://newmedium2-backend.onrender.com/${user.userId}`,
           {
             withCredentials: true,
           }
@@ -71,7 +71,7 @@ function Profile() {
 
   const deleteBlog = async (blogid) => {
     try {
-      await axios.delete(`http://localhost:5000/delete/${blogid}`, {
+      await axios.delete(`https://newmedium2-backend.onrender.com/${blogid}`, {
         withCredentials: true,
       });
       setBlogs(blogs.filter((blog) => blog._id !== blogid));

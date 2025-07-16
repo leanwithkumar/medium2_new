@@ -18,7 +18,7 @@ function EditBlog() {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/readblog/${blogid}`);
+        const res = await axios.get(`https://newmedium2-backend.onrender.com/${blogid}`);
         const blog = res.data;
         setTitle(blog.title);
         setContent(blog.content);
@@ -37,7 +37,7 @@ function EditBlog() {
       }
       toast.info("Updating your Blog")
     await axios.put(
-  `http://localhost:5000/editblog/${blogid}`,
+  `https://newmedium2-backend.onrender.com/${blogid}`,
   { title, content, tags },
   { withCredentials: true }
 );

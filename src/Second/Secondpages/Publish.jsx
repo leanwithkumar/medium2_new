@@ -23,7 +23,7 @@ function Publish() {
         return toast.warn('All fields are required');
       }
       toast.info("publising you blog")
-      const posted = await axios.post('http://localhost:5000/publish', {
+      const posted = await axios.post('https://newmedium2-backend.onrender.com/publish', {
         title,
         content,
         tags,

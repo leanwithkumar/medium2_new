@@ -10,7 +10,7 @@ function Trending() {
 
   const fetchBlogs = async (pageNumber) => {
     try {
-      const res = await axios.get(`http://localhost:5000/trending?page=${pageNumber}`, {
+      const res = await axios.get(`https://newmedium2-backend.onrender.com/trending?page=${pageNumber}`, {
       withCredentials: true
       });
       const newBlogs = res.data;

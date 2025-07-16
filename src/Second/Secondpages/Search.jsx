@@ -12,7 +12,7 @@ function Search() {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-const res = await axios.get(`http://localhost:5000/search?query=${query}`, {
+const res = await axios.get(`https://newmedium2-backend.onrender.com/search?query=${query}`, {
   withCredentials: true
 });
         setResults(res.data);
