@@ -22,7 +22,7 @@ function Profile() {
         }
 
         const result = await axios.get(
-          `https://newmedium2-backend.onrender.com/${user.userId}`,
+          `https://newmedium2-backend.onrender.com/usersblog/${user.userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -84,7 +84,7 @@ function Profile() {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(`https://newmedium2-backend.onrender.com/${blogId}`, {
+      await axios.delete(`https://newmedium2-backend.onrender.com/delete/${blogId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

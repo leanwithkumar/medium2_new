@@ -89,7 +89,7 @@ function Signin() {
               </div>
 
               <div>
-                <Link to="/getstarted" className="text-xl md:text-2xl font-mono text-gray-800 hover:underline">
+                <Link to="/signup" className="text-xl md:text-2xl font-mono text-gray-800 hover:underline">
                   Are you new to medium2
                 </Link>
               </div>

@@ -12,7 +12,7 @@ function Readblog() {
       try {
         const token = localStorage.getItem('token');
 
-        const res = await axios.get(`https://newmedium2-backend.onrender.com/${blogid}`, {
+        const res = await axios.get(`https://newmedium2-backend.onrender.com/readblog/${blogid}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

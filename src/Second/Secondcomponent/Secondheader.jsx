@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
@@ -14,17 +13,16 @@ function Secondheader() {
 
   const logoutuser = async () => {
     try {
-      await axios.get('https://newmedium2-backend.onrender.com/logout', {
-        withCredentials: true
-      });
+     
       localStorage.removeItem("medium2token");
    
-setUser({
+  setUser({
   userName: "",
   userEmail: "",
   userId: ""
 });
 localStorage.removeItem("user"); 
+localStorage.removeItem("token");
 setUser({ userName: "", userEmail: "", userId: "" });
       navigate('/signin');
     } catch (err) {

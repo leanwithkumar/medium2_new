@@ -22,7 +22,7 @@ function EditBlog() {
           return;
         }
 
-        const res = await axios.get(`https://newmedium2-backend.onrender.com/${blogid}`, {
+        const res = await axios.get(`https://newmedium2-backend.onrender.com/readblog/${blogid}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -65,7 +65,7 @@ function EditBlog() {
       });
 
       await axios.put(
-        `https://newmedium2-backend.onrender.com/${blogid}`,
+        `https://newmedium2-backend.onrender.com/editblog/${blogid}`,
         { title, content, tags },
         {
           headers: {
