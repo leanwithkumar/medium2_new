@@ -11,16 +11,23 @@ function Search() {
 
   useEffect(() => {
     const fetchResults = async () => {
+      setLoading(true); // Always reset loading state on new query
       try {
-        const token = JSON.parse(localStorage.getItem("token"));
-        const res = await axios.get(`https://newmedium2-backend.onrender.com/search?query=${query}`, {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.warn("Token missing.");
+          return;
+        }
+
+        const res = await axios.get(`https://newmedium2-backend.onrender.com/search?query=${encodeURIComponent(query)}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setResults(res.data);
+
+        setResults(res.data || []);
       } catch (err) {
-        console.error("Search failed", err);
+        console.error("❌ Search failed:", err.response?.data || err.message);
       } finally {
         setLoading(false);
       }
@@ -30,11 +37,11 @@ function Search() {
   }, [query]);
 
   if (loading) {
-    return <div className="text-center py-10">Loading search results...</div>;
+    return <div className="text-center py-10 font-mono">Loading search results...</div>;
   }
 
   return (
-    <div className="p-6 max-w-3xl mx-auto font-mono">
+    <div className="p-6 max-w-3xl mx-auto font-mono text-gray-700">
       <h2 className="text-4xl mb-4">
         Showing results for <span className="text-red-500">{query}</span>:
       </h2>
@@ -44,7 +51,7 @@ function Search() {
       ) : (
         results.map((blog) => (
           <Link to={`/medium2/readblog/${blog._id}`} key={blog._id}>
-            <div className="mb-6 py-4 border-b">
+            <div className="mb-6 py-4 border-b hover:bg-gray-50 transition">
               <h3 className="text-3xl py-2">{blog.title}</h3>
               <p className="text-sm text-gray-600">
                 by {blog.author?.username || "Unknown"} on{" "}

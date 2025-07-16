@@ -4,7 +4,7 @@ import userAtom from "../Store/userAtom";
 
 const PrivateRoute = () => {
   const user = useRecoilValue(userAtom);
-  const localUser = JSON.parse(localStorage.getItem("user"));
+  const localUser = JSON.parse(localStorage.getItem("user")); // ✅ Parse the JSON string
 
   const isAuthenticated = user?.userId || localUser?.userId;
 

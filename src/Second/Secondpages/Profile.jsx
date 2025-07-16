@@ -14,7 +14,13 @@ function Profile() {
   useEffect(() => {
     const fetchUserBlogs = async () => {
       try {
-        const token = JSON.parse(localStorage.getItem("token"));
+        const token = localStorage.getItem("token");
+
+        if (!user?.userId || !token) {
+          toast.error("User not logged in or token missing");
+          return;
+        }
+
         const result = await axios.get(
           `https://newmedium2-backend.onrender.com/${user.userId}`,
           {
@@ -23,16 +29,17 @@ function Profile() {
             },
           }
         );
-        setBlogs(result.data.blogs);
+
+        setBlogs(result.data.blogs || []);
       } catch (err) {
-        console.error('Failed to fetch blogs', err);
+        console.error('❌ Failed to fetch blogs', err);
         toast.error('Could not fetch blogs. Try again.');
       } finally {
         setLoading(false);
       }
     };
 
-    if (user.userId) fetchUserBlogs();
+    fetchUserBlogs();
   }, [user.userId]);
 
   const handleCopy = async () => {
@@ -45,7 +52,7 @@ function Profile() {
     }
   };
 
-  const confirmAndDelete = (blogid) => {
+  const confirmAndDelete = (blogId) => {
     toast(
       ({ closeToast }) => (
         <div className="text-m font-mono">
@@ -53,16 +60,16 @@ function Profile() {
           <div className="flex justify-end gap-2">
             <button
               onClick={() => {
-                deleteBlog(blogid);
+                deleteBlog(blogId);
                 closeToast();
               }}
-              className="px-3 py-1 bg-red-500 text-white rounded font-mono"
+              className="px-3 py-1 bg-red-500 text-white rounded"
             >
               Yes
             </button>
             <button
               onClick={closeToast}
-              className="px-3 py-1 border border-gray-400 rounded font-mono"
+              className="px-3 py-1 border border-gray-400 rounded"
             >
               Cancel
             </button>
@@ -73,18 +80,20 @@ function Profile() {
     );
   };
 
-  const deleteBlog = async (blogid) => {
+  const deleteBlog = async (blogId) => {
     try {
-      const token = JSON.parse(localStorage.getItem("token"));
-      await axios.delete(`https://newmedium2-backend.onrender.com/${blogid}`, {
+      const token = localStorage.getItem("token");
+
+      await axios.delete(`https://newmedium2-backend.onrender.com/${blogId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setBlogs(blogs.filter((blog) => blog._id !== blogid));
+
+      setBlogs((prev) => prev.filter((blog) => blog._id !== blogId));
       toast.success('Blog deleted successfully');
     } catch (err) {
-      console.error('Failed to delete blog', err);
+      console.error('❌ Failed to delete blog', err);
       toast.error('Error deleting blog');
     }
   };
@@ -93,7 +102,7 @@ function Profile() {
     <>
       <div className="py-5 text-gray-600 font-mono">
         <div className="text-5xl flex justify-between items-center">
-          <div>{user.userName}</div>
+          <div>{user.userName || "Profile"}</div>
           <button
             onClick={handleCopy}
             className="text-2xl px-3 text-gray-700"
@@ -110,7 +119,7 @@ function Profile() {
         ) : blogs.length === 0 ? (
           <div className="text-center py-10 text-gray-600 font-mono">
             <p className="mb-4 text-xl">You haven't written any blogs yet.</p>
-            <Link to="/publish" className="hover:underline">
+            <Link to="/publish" className="hover:underline text-green-600">
               Write a blog
             </Link>
           </div>
@@ -157,7 +166,6 @@ function Profile() {
         autoClose={2000}
         hideProgressBar={true}
         newestOnTop={false}
-        rtl={false}
         pauseOnFocusLoss={false}
         draggable
         pauseOnHover

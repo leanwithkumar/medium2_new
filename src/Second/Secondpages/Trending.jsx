@@ -1,32 +1,48 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Trending() {
   const [blogs, setBlogs] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const loaderRef = useRef(null);
 
   const fetchBlogs = async (pageNumber) => {
-    try {
-      const token = JSON.parse(localStorage.getItem("token"));
+    const token = localStorage.getItem("token");
 
-      const res = await axios.get(`https://newmedium2-backend.onrender.com/trending?page=${pageNumber}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+    if (!token) {
+      toast.error("Token missing. Please login again.");
+      return;
+    }
+
+    if (isFetching) return;
+
+    setIsFetching(true);
+    try {
+      const res = await axios.get(
+        `https://newmedium2-backend.onrender.com/trending?page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      });
+      );
 
       const newBlogs = res.data;
 
-      if (newBlogs.length === 0) {
+      if (!Array.isArray(newBlogs) || newBlogs.length === 0) {
         setHasMore(false);
       } else {
         setBlogs((prev) => [...prev, ...newBlogs]);
       }
     } catch (err) {
-      console.error("Failed to fetch trending blogs:", err);
+      console.error("❌ Failed to fetch trending blogs:", err?.response?.data || err.message);
+      toast.error("Unable to fetch blogs. Try again.");
+    } finally {
+      setIsFetching(false);
     }
   };
 
@@ -34,12 +50,15 @@ function Trending() {
     fetchBlogs(page);
   }, [page]);
 
-  const handleObserver = useCallback((entries) => {
-    const target = entries[0];
-    if (target.isIntersecting && hasMore) {
-      setPage((prev) => prev + 1);
-    }
-  }, [hasMore]);
+  const handleObserver = useCallback(
+    (entries) => {
+      const target = entries[0];
+      if (target.isIntersecting && hasMore && !isFetching) {
+        setPage((prev) => prev + 1);
+      }
+    },
+    [hasMore, isFetching]
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {

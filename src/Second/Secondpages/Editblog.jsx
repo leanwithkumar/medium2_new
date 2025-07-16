@@ -16,22 +16,34 @@ function EditBlog() {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await axios.get(`https://newmedium2-backend.onrender.com/${blogid}`);
+        const token = localStorage.getItem('token');
+        if (!token) {
+          toast.error("Unauthorized: No token found");
+          return;
+        }
+
+        const res = await axios.get(`https://newmedium2-backend.onrender.com/${blogid}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
         const blog = res.data;
         setTitle(blog.title);
         setContent(blog.content);
         setTags(blog.tags || []);
       } catch (err) {
-        console.error("Failed to load blog", err);
+        console.error("❌ Failed to load blog", err);
         toast.error("Failed to load blog");
       }
     };
+
     fetchBlog();
   }, [blogid]);
 
   const editThis = async () => {
     try {
-      if (!title || !content) {
+      if (!title.trim() || !content.trim()) {
         return toast.warn('All fields are required', {
           position: 'bottom-right',
           autoClose: 3000,
@@ -40,14 +52,17 @@ function EditBlog() {
         });
       }
 
-      toast.info("Updating your Blog", {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return toast.error("Unauthorized: Please login again");
+      }
+
+      toast.info("Updating your Blog...", {
         position: 'bottom-right',
         autoClose: 2000,
         theme: 'light',
         transition: Bounce,
       });
-
-      const token = JSON.parse(localStorage.getItem("token"));
 
       await axios.put(
         `https://newmedium2-backend.onrender.com/${blogid}`,
@@ -66,19 +81,17 @@ function EditBlog() {
         transition: Bounce,
       });
 
-      toast.success('Redirecting to Profile', {
+      setTimeout(() => {
+        navigate('/medium2/profile');
+      }, 2500);
+    } catch (err) {
+      console.error("❌ Update failed", err);
+      toast.error(err?.response?.data?.errors?.[0] || err.message, {
         position: 'bottom-right',
-        autoClose: 2000,
+        autoClose: 3000,
         theme: 'light',
         transition: Bounce,
       });
-
-      setTimeout(() => {
-        navigate('/medium2/profile');
-      }, 3000);
-    } catch (err) {
-      console.log(err);
-      toast.error(err?.response?.data?.errors?.[0] || err.message);
     }
   };
 
@@ -88,8 +101,8 @@ function EditBlog() {
         <div className="pb-10">
           <TextareaAutosize
             minRows={1}
-            className="text-5xl font-san text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-5xl placeholder:font-serif resize-none overflow-hidden"
-            placeholder="Share your thought"
+            className="text-5xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-5xl placeholder:font-serif resize-none overflow-hidden"
+            placeholder="Edit your blog title..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -99,7 +112,7 @@ function EditBlog() {
           <TextareaAutosize
             minRows={5}
             className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-3xl placeholder:font-serif resize-none overflow-hidden"
-            placeholder="Make us understand"
+            placeholder="Edit your blog content..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />
@@ -111,7 +124,7 @@ function EditBlog() {
               key={index}
               className="px-3 py-1 bg-gray-100 rounded-full text-sm flex items-center"
             >
-              # {tag}
+              #{tag}
               <button
                 className="ml-2 text-black"
                 onClick={() => setTags(tags.filter((_, i) => i !== index))}
@@ -131,24 +144,24 @@ function EditBlog() {
               if (e.key === 'Enter' && tagInput.trim()) {
                 e.preventDefault();
                 if (tags.length >= 5) {
-                  alert('Maximum 5 tags allowed');
+                  toast.warn('Maximum 5 tags allowed');
                   return;
                 }
                 setTags([...tags, tagInput.trim()]);
                 setTagInput('');
               }
             }}
-            placeholder="tags"
+            placeholder="Add tags and press Enter"
             className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-3xl placeholder:font-serif resize-none overflow-hidden"
           />
         </div>
 
-        <div className="md:flex gap-4 p-2 text-base sm:text-lg md:text-xl">
+        <div className="flex gap-4 p-2 text-base sm:text-lg md:text-xl">
           <button
             onClick={editThis}
             className="text-white px-8 py-2 rounded-full bg-green-400 font-medium shadow-sm"
           >
-            Edit
+            Update Blog
           </button>
         </div>
       </div>
@@ -158,7 +171,6 @@ function EditBlog() {
         autoClose={2000}
         hideProgressBar={true}
         newestOnTop={false}
-        rtl={false}
         pauseOnFocusLoss={false}
         draggable
         pauseOnHover

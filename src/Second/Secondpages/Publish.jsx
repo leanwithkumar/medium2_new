@@ -13,22 +13,23 @@ function Publish() {
   const [tagInput, setTagInput] = useState('');
   const navigate = useNavigate();
   const user = useRecoilValue(userAtom);
-  const userID = user.userId;
+  const userID = user?.userId;
 
   const publishthis = async () => {
+    if (!title || !content) {
+      return toast.warn('All fields are required');
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return toast.error("You are not logged in. Please sign in.");
+    }
+
     try {
-      if (!title || !content) {
-        return toast.warn('All fields are required');
-      }
-
-      const token = JSON.parse(localStorage.getItem("token"));
-      if (!token) {
-        return toast.error("You are not logged in. Please sign in.");
-      }
-
+      toast.dismiss(); // clear existing toasts
       toast.info("Publishing your blog...");
 
-      const posted = await axios.post(
+       await axios.post(
         'https://newmedium2-backend.onrender.com/publish',
         { title, content, tags, userID },
         {
@@ -38,48 +39,62 @@ function Publish() {
         }
       );
 
-      toast.success("Blog added successfully");
-      toast.success("Redirecting to home page");
-      console.log(posted);
+      toast.success("✅ Blog added successfully");
+      setTitle('');
+      setContent('');
+      setTags([]);
+      setTagInput('');
 
       setTimeout(() => {
         navigate('/medium2');
-      }, 3000);
+      }, 2000);
 
     } catch (err) {
-      console.log(err);
-      toast.error(err?.response?.data?.errors?.[0] || err.message);
+      console.error("❌ Publish error:", err);
+      toast.error(err?.response?.data?.errors?.[0] || err?.response?.data?.message || "Failed to publish blog");
+    }
+  };
+
+  const handleTagInput = (e) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault();
+      if (tags.includes(tagInput.trim())) {
+        return toast.warn("Tag already added");
+      }
+      if (tags.length >= 5) {
+        return toast.warn('Maximum 5 tags allowed');
+      }
+      setTags([...tags, tagInput.trim()]);
+      setTagInput('');
     }
   };
 
   return (
     <>
+      {/* Top Bar */}
       <div className="w-full border-b border-gray-300">
-        <div className="flex justify-evenly items-center md:px-25 px-5">
-          <div className="flex justify-between">
-            <Link to="/medium2">
-              <img
-                src="/Medium2.png"
-                width="170"
-                height="40"
-                className="max-w-full h-auto py-5"
-                alt="Logo"
-              />
-            </Link>
-          </div>
-
-          <div className="md:flex flex-wrap justify-center gap-4 p-2 text-base sm:text-lg md:text-xl">
-            <button
-              onClick={publishthis}
-              className="text-white px-8 py-2 rounded-full bg-green-400 font-medium shadow-sm"
-            >
-              Publish
-            </button>
-          </div>
+        <div className="flex justify-between items-center md:px-20 px-5">
+          <Link to="/medium2">
+            <img
+              src="/Medium2.png"
+              width="170"
+              height="40"
+              className="max-w-full h-auto py-5"
+              alt="Logo"
+            />
+          </Link>
+          <button
+            onClick={publishthis}
+            className="text-white px-8 py-2 rounded-full bg-green-500 font-medium shadow-sm"
+          >
+            Publish
+          </button>
         </div>
       </div>
 
-      <div className="mx-5 md:ml-30 md:mr-80 my-20">
+      {/* Form */}
+      <div className="mx-5 md:ml-40 md:mr-60 my-20">
+        {/* Title Input */}
         <div className="pb-10">
           <TextareaAutosize
             minRows={1}
@@ -90,9 +105,10 @@ function Publish() {
           />
         </div>
 
+        {/* Content Input */}
         <div className="pb-10 font-mono">
           <TextareaAutosize
-            minRows={5}
+            minRows={6}
             className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-3xl placeholder:font-serif resize-none overflow-hidden"
             placeholder="Make us understand"
             value={content}
@@ -100,13 +116,14 @@ function Publish() {
           />
         </div>
 
-        <div className="mb-4 flex items-center gap-2 flex-wrap">
+        {/* Tags Display */}
+        <div className="mb-4 flex items-center gap-2 flex-wrap font-mono">
           {tags.map((tag, index) => (
             <span
               key={index}
-              className="px-3 py-1 bg-gray-100 rounded-full text-sm flex items-center font-mono"
+              className="px-3 py-1 bg-gray-100 rounded-full text-sm flex items-center"
             >
-              # {tag}
+              #{tag}
               <button
                 className="ml-2 text-black"
                 onClick={() => setTags(tags.filter((_, i) => i !== index))}
@@ -117,28 +134,20 @@ function Publish() {
           ))}
         </div>
 
+        {/* Tag Input */}
         <div className="mb-6 font-mono">
           <input
             type="text"
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && tagInput.trim()) {
-                e.preventDefault();
-                if (tags.length >= 5) {
-                  alert('Maximum 5 tags allowed');
-                  return;
-                }
-                setTags([...tags, tagInput.trim()]);
-                setTagInput('');
-              }
-            }}
-            placeholder="tags"
+            onKeyDown={handleTagInput}
+            placeholder="Add tags (max 5) and press Enter"
             className="text-2xl text-gray-600 border-l-2 pl-5 focus:outline-none w-full placeholder:text-3xl placeholder:font-serif resize-none overflow-hidden"
           />
         </div>
       </div>
 
+      {/* Toasts */}
       <ToastContainer
         position="bottom-right"
         autoClose={4000}
